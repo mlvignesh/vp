@@ -115,9 +115,10 @@
     font-family:'Cormorant Garamond',serif;
     font-weight:500;font-size:1.5rem;color:var(--gold);margin-bottom:6px;
   }
-  .details p{line-height:1.7;color:var(--ink)}
+  .details p{line-height:1.7;color:var(--ink) !important}
   .details .small{font-size:.88rem;color:var(--muted)}
   .details + .details{margin-top:26px}
+  .details a{color:var(--muted) !important}
 
   .buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
   .btn{
@@ -251,31 +252,9 @@
   2. Optionally tweak the colors in :root at the top of the <style>.
 -->
 
-<!-- Envelope intro (shown first, then fades to the invitation) -->
-<div class="envelope-stage" id="stage">
-  <p class="stage-eyebrow">You have received an invitation</p>
-  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Open the invitation">
-    <div class="env-back"></div>
-    <div class="env-letter">
-      <span class="l1" id="envNames"></span>
-      <small>Engagement</small>
-    </div>
-    <div class="env-front"></div>
-    <div class="env-flap"></div>
-    <div class="env-seal" id="seal"></div>
-  </div>
-  <p class="tap">Tap the envelope to open</p>
-</div>
 
 <main class="card">
   <div class="eyebrow">You are invited</div>
-
-  <svg class="ring" viewBox="0 0 64 64" fill="none" stroke="#5e2b97" stroke-width="2" aria-hidden="true">
-    <circle cx="32" cy="40" r="16"/>
-    <circle cx="32" cy="40" r="11" stroke-opacity=".4"/>
-    <path d="M32 24 L25 14 L32 8 L39 14 Z" fill="#f7dcea"/>
-    <path d="M25 14 H39 M32 8 V24" stroke-opacity=".5"/>
-  </svg>
 
   <p class="together">Together with their families</p>
   <h1 class="names">
@@ -294,53 +273,29 @@
   </div>
   <div class="year" id="monthyear"></div>
 
-  <div class="countdown" id="countdown" aria-live="off"></div>
-
   <div class="divider">&#10086;</div>
 
   <section class="details">
     <h2>Venue</h2>
-    <p id="venue"></p>
-    <p class="small" id="address"></p>
+    <a id="venue" href="https://maps.app.goo.gl/arzrcJvYDQLVViKw9" target="_blank"></a>
   </section>
-
-  <section class="details">
-    <h2>Ring Ceremony</h2>
-    <p id="ceremony"></p>
-    <p class="small" id="dress"></p>
-  </section>
-
-  <div class="buttons">
-    <a class="btn primary" id="cal" href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
-    <a class="btn ghost" id="map" href="#" target="_blank" rel="noopener">View Map</a>
-  </div>
-
-  <div class="divider">&#10086;</div>
-
-  <section class="details">
-    <h2>Share Your Moments</h2>
-    <p>Captured something lovely? Upload your photos and videos so the family can relive the day.</p>
-  </section>
-  <div class="buttons" style="margin-top:22px">
-    <a class="btn primary" id="photos" href="#" target="_blank" rel="noopener">Upload Photos</a>
-  </div>
 
   <div class="foot">With love
-    <small id="hosts"></small>
+    <small >Our Families</small>
   </div>
 </main>
 
 <script>
 /* ============ EDIT YOUR DETAILS HERE ============ */
 const CONFIG = {
-  name1: "Mahalingam Vignesh",
-  name2: "Priyadarshini",
+  name1: "Priyadarshini",
+  name2: "Mahalingam Vignesh",
   // Local date & time of the ring ceremony: YYYY-MM-DDTHH:MM (24-hour clock)
   start: "2026-11-29T10:30",
   durationHours: 4,
   timezone: "Asia/Kolkata",
-  venue: "The Grand Orchid Ballroom",
-  address: "12 Garden Road, Bengaluru, Karnataka",
+  venue: "Lakshmi Mini Hall, Thuraiyur",
+  address: "",
   mapQuery: "The Grand Orchid Ballroom Bengaluru",
   dressCode: "",   // set to "" to hide
   hosts: "The Families",
@@ -370,49 +325,6 @@ $("map").href = "https://www.google.com/maps/search/?api=1&query=" + enc(CONFIG.
 $("photos").href = CONFIG.photoLink;
 document.title = `${CONFIG.name1} & ${CONFIG.name2} · Engagement Invitation`;
 
-/* ---------- Envelope ---------- */
-const stage = $("stage"), env = $("envelope");
-$("envNames").textContent = `${CONFIG.name1} & ${CONFIG.name2}`;
-$("seal").textContent = (CONFIG.name1[0] + "&" + CONFIG.name2[0]).toUpperCase();
-document.body.classList.add("locked");
-stage.classList.add("active");
-
-function openEnvelope(){
-  if (stage.classList.contains("opening")) return;
-  stage.classList.add("opening");
-  setTimeout(()=>{                       // fade envelope away, reveal invitation
-    stage.classList.add("leaving");
-    document.body.classList.remove("locked");
-    window.scrollTo(0,0);
-  }, 2100);
-  setTimeout(()=> stage.remove(), 3100);
-}
-env.addEventListener("click", openEnvelope);
-env.addEventListener("keydown", e=>{
-  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openEnvelope(); }
-});
-
-/* ---------- Google Calendar link ---------- */
-const pad = n => String(n).padStart(2,"0");
-const gcal = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
-const endD = new Date(d.getTime() + CONFIG.durationHours*3600000);
-$("cal").href = "https://calendar.google.com/calendar/render?action=TEMPLATE"
-  + "&text=" + enc(`${CONFIG.name1} & ${CONFIG.name2} – Engagement Ring Ceremony`)
-  + "&dates=" + gcal(d) + "/" + gcal(endD)
-  + "&ctz=" + enc(CONFIG.timezone)
-  + "&details=" + enc(`Join us to celebrate the engagement of ${CONFIG.name1} & ${CONFIG.name2}. ${CONFIG.hosts}`)
-  + "&location=" + enc(`${CONFIG.venue}, ${CONFIG.address}`);
-
-/* ---------- Countdown ---------- */
-function tick(){
-  let diff = d - new Date();
-  const box = $("countdown");
-  if (diff <= 0){ box.innerHTML = "<p style='font-family:Cormorant Garamond,serif;font-size:1.3rem;color:#d681a6'>The celebration has begun 💍</p>"; return; }
-  const s = Math.floor(diff/1000);
-  const parts = [["Days",Math.floor(s/86400)],["Hours",Math.floor(s%86400/3600)],["Mins",Math.floor(s%3600/60)],["Secs",s%60]];
-  box.innerHTML = parts.map(([l,v])=>`<div><b>${String(v).padStart(2,"0")}</b><span>${l}</span></div>`).join("");
-}
-tick(); setInterval(tick,1000);
 
 /* ---------- Falling petals (start after the envelope opens) ---------- */
 if (!matchMedia("(prefers-reduced-motion: reduce)").matches){
